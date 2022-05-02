@@ -7,6 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class UsuariConsultaDTO {
     private String username;
-    private String avatar;
     private String rol;
 }

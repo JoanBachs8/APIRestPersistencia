@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
@@ -18,14 +19,32 @@ public class ConfiguracioSeguretatWeb extends WebSecurityConfigurerAdapter {
     private final ElMeuUserDetailsService elmeuUserDetailsService;
     private final PasswordEncoder xifrat;
 
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(elmeuUserDetailsService).passwordEncoder(xifrat);
+
+        //auth.inMemoryAuthentication().passwordEncoder(xifrat).withUser("Joan").password(xifrat.encode("123456")).roles("ADMIN");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors() //amb aquesta línia evitem la configuració custom del cors en un fitxer a part
+        http
+                .httpBasic()
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+//per poder accedir al h2-console
+                //  .authorizeRequests().antMatchers("/").permitAll().and()
+                //  .authorizeRequests().antMatchers("/h2-console/**").permitAll()
+                // .and()
+                .csrf().disable()
+                // .headers().frameOptions().disable()
+                // .and()
+                .authorizeRequests()
+                .anyRequest().authenticated();
+
+        /*http.cors() //amb aquesta línia evitem la configuració custom del cors en un fitxer a part
                 .and()
                 .httpBasic()
                 .authenticationEntryPoint(elmeuEntryPoint)
@@ -37,7 +56,7 @@ public class ConfiguracioSeguretatWeb extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.PUT, "/begudes/**").hasRole("USER")
                 .antMatchers(HttpMethod.DELETE, "/begudes/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.POST, "/begudes/**").hasAnyRole("USER", "ADMIN")
-                .anyRequest().authenticated();
+                .anyRequest().authenticated();*/
         // .and()
         // .csrf().disable();
     }

@@ -24,7 +24,6 @@ public class Usuari implements UserDetails {
     @Column(unique = true)
     private String username; //no es repeteix username
     private String password;
-    private String avatar;
     private String rol = "USER"; //per defecte
 
     @Override
